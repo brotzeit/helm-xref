@@ -31,35 +31,25 @@
 (defun helm-xref-candidates (xref-alist)
   "Convert XREF-ALIST items to helm candidates and add them to `helm-xref-alist'."
   (cl-loop for ((group . xrefs) . more1) on xref-alist
-           for max-line-width =
-           (cl-loop for xref in xrefs
-                    maximize (let ((line (xref-location-line
-                                          (oref xref location))))
-                               (length (and line (format "%d" line)))))
-           for line-format = (and max-line-width
-                                  (format "%%%dd: " max-line-width))
-           do
-           (cl-loop for (xref . more2) on (reverse xrefs) do
-                    (with-slots (summary location) xref
-                      (let* ((line (xref-location-line location))
-                             (prefix
-                              (if line
-                                  (propertize (format line-format line)
-                                              'face 'compilation-line-number)
-                                "  ")))
-                        (let ((marker (xref-location-marker location))
-                              candidate)
-                          (setq candidate
-                                (concat
-                                 (propertize (car (reverse (split-string group "\\/")))
-                                             'font-lock-face '(:foreground "cyan"))
-                                 ":"
-                                 (when (string= "integer" (type-of line))
-                                   (propertize (int-to-string line)
-                                               'font-lock-face 'compilation-line-number))
-                                 ":"
-                                 summary))
-                          (push `(,candidate . ,marker) helm-xref-alist)))))))
+           do (cl-loop for (xref . more2) on xrefs do
+                       (with-slots (summary location) xref
+                         (let* ((line (xref-location-line location))
+                                (prefix
+                                 (if line
+                                     line "")))
+                           (let ((marker (xref-location-marker location))
+                                 candidate)
+                             (setq candidate
+                                   (concat
+                                    (propertize (car (reverse (split-string group "\\/")))
+                                                'font-lock-face '(:foreground "cyan"))
+                                    ":"
+                                    (when (string= "integer" (type-of line))
+                                      (propertize (int-to-string line)
+                                                  'font-lock-face 'compilation-line-number))
+                                    ":"
+                                    summary))
+                             (push `(,candidate . ,marker) helm-xref-alist)))))))
 
 (defun helm-xref-goto-location (location func)
   "Set buffer and point according to xref-location LOCATION.
