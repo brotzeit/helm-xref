@@ -84,7 +84,7 @@ Use FUNC to display buffer."
                              (cl-sort candidates #'string-lessp :key #'car))
     :candidate-number-limit 9999))
 
-(defun helm-xref (xrefs _alist)
+(defun helm-xref-show-xrefs (xrefs _alist)
   "Function to display XREFS.
 
 Needs to be set the value of `xref-show-xrefs-function'."
