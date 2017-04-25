@@ -71,7 +71,20 @@ Use FUNC to display buffer."
     :action (lambda (candidate)
               (helm-xref-goto-location candidate 'switch-to-buffer))
     :candidate-transformer (lambda (candidates)
-                             (cl-sort candidates #'string-lessp :key #'car))
+                             (let (group
+                                   result)
+                               (dolist (xref (reverse (cl-sort candidates #'string-lessp :key #'car)))
+                                 (cond
+                                  ((or (= (length group) 0)
+                                       (string= (nth 0 (split-string (car xref) ":"))
+                                                (nth 0 (split-string (car (nth -1 group)) ":"))))
+                                   (push xref group))
+                                  (t
+                                   (dolist (x (cl-sort group #'> :key #'cdr))
+                                     (push x result))
+                                   (setq group nil)
+                                   (push xref group))))
+                               result))
     :candidate-number-limit 9999))
 
 (defun helm-xref-show-xrefs (xrefs _alist)
