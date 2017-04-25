@@ -28,28 +28,28 @@
 (defvar helm-xref-alist nil
   "Holds helm candidates.")
 
-(defun helm-xref-candidates (xref-alist)
+(defun helm-xref-candidates (xrefs)
   "Convert XREF-ALIST items to helm candidates and add them to `helm-xref-alist'."
-  (cl-loop for ((group . xrefs) . more1) on xref-alist
-           do (cl-loop for (xref . more2) on xrefs do
-                       (with-slots (summary location) xref
-                         (let* ((line (xref-location-line location))
-                                (prefix
-                                 (if line
-                                     line "")))
-                           (let ((marker (xref-location-marker location))
-                                 candidate)
-                             (setq candidate
-                                   (concat
-                                    (propertize (car (reverse (split-string group "\\/")))
-                                                'font-lock-face '(:foreground "cyan"))
-                                    ":"
-                                    (when (string= "integer" (type-of line))
-                                      (propertize (int-to-string line)
-                                                  'font-lock-face 'compilation-line-number))
-                                    ":"
-                                    summary))
-                             (push `(,candidate . ,marker) helm-xref-alist)))))))
+  (dolist (xref xrefs)
+    (with-slots (summary location) xref
+      (let* ((line (xref-location-line location))
+             (prefix
+              (if line
+                  line ""))
+             (marker (xref-location-marker location))
+             (file (xref-location-group location ))
+             candidate)
+        (setq candidate
+              (concat
+               (propertize (car (reverse (split-string file "\\/")))
+                           'font-lock-face '(:foreground "cyan"))
+               ":"
+               (when (string= "integer" (type-of line))
+                 (propertize (int-to-string line)
+                             'font-lock-face 'compilation-line-number))
+               ":"
+               summary))
+        (push `(,candidate . ,marker) helm-xref-alist)))))
 
 (defun helm-xref-goto-location (location func)
   "Set buffer and point according to xref-location LOCATION.
@@ -78,12 +78,11 @@ Use FUNC to display buffer."
   "Function to display XREFS.
 
 Needs to be set the value of `xref-show-xrefs-function'."
-  (let ((xref-alist (xref--analyze xrefs)))
-    (setq helm-xref-alist nil)
-    (helm-xref-candidates xref-alist)
-    (helm :sources (helm-xref-source)
-          :truncate-lines t
-          :buffer "*helm-xref*")))
+  (setq helm-xref-alist nil)
+  (helm-xref-candidates xrefs)
+  (helm :sources (helm-xref-source)
+        :truncate-lines t
+        :buffer "*helm-xref*"))
 
 (provide 'helm-xref)
 ;;; helm-xref.el ends here
