@@ -4,6 +4,7 @@
 
 ;; Author: Fritz Stelzer <brotzeitmacher@gmail.com>
 ;; URL: https://github.com/brotzeitmacher/helm-xref
+;; Package-Version: 20170425.1440
 ;; Version: 0.2
 ;; Package-Requires: ((emacs "25.1") (helm "1.9.4"))
 
@@ -33,20 +34,18 @@
   (dolist (xref xrefs)
     (with-slots (summary location) xref
       (let* ((line (xref-location-line location))
-             (prefix
-              (if line
-                  line ""))
              (marker (xref-location-marker location))
-             (file (xref-location-group location ))
+             (file (xref-location-group location))
              candidate)
         (setq candidate
               (concat
                (propertize (car (reverse (split-string file "\\/")))
                            'font-lock-face '(:foreground "cyan"))
-               ":"
                (when (string= "integer" (type-of line))
-                 (propertize (int-to-string line)
-                             'font-lock-face 'compilation-line-number))
+                 (concat
+                  ":"
+                  (propertize (int-to-string line)
+                              'font-lock-face 'compilation-line-number)))
                ":"
                summary))
         (push `(,candidate . ,marker) helm-xref-alist)))))
@@ -73,17 +72,20 @@ Use FUNC to display buffer."
     :candidate-transformer (lambda (candidates)
                              (let (group
                                    result)
-                               (dolist (xref (reverse (cl-sort candidates #'string-lessp :key #'car)))
-                                 (cond
-                                  ((or (= (length group) 0)
-                                       (string= (nth 0 (split-string (car xref) ":"))
-                                                (nth 0 (split-string (car (nth -1 group)) ":"))))
-                                   (push xref group))
-                                  (t
-                                   (dolist (x (cl-sort group #'> :key #'cdr))
-                                     (push x result))
-                                   (setq group nil)
-                                   (push xref group))))
+                               (loop for x in (reverse (cl-sort candidates #'string-lessp :key #'car))
+                                     do (cond
+                                         ((or (= (length group) 0)
+                                              (string= (nth 0 (split-string (car x) ":"))
+                                                       (nth 0 (split-string (car (nth -1 group)) ":"))))
+                                          (push x group))
+                                         (t
+                                          (dolist (xref (cl-sort group #'> :key #'cdr))
+                                            (push xref result))
+                                          (setq group nil)
+                                          (push x group)))
+                                     finally (when (> (length group) 0)
+                                               (dolist (xref (cl-sort group #'> :key #'cdr))
+                                                 (push xref result))))
                                result))
     :candidate-number-limit 9999))
 
