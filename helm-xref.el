@@ -4,7 +4,6 @@
 
 ;; Author: Fritz Stelzer <brotzeitmacher@gmail.com>
 ;; URL: https://github.com/brotzeitmacher/helm-xref
-;; Package-Version: 20170425.1440
 ;; Version: 0.2
 ;; Package-Requires: ((emacs "25.1") (helm "1.9.4"))
 
