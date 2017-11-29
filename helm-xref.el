@@ -28,6 +28,16 @@
 (defvar helm-xref-alist nil
   "Holds helm candidates.")
 
+(defface helm-xref-file-name
+  '((t (:foreground "cyan")))
+  "Face for xref file name"
+  :group 'helm-xref)
+
+(defface helm-xref-line-number
+  '((t (:inherit 'compilation-line-number)))
+  "Face for xref line number"
+  :group 'helm-xref)
+
 (defun helm-xref-candidates (xrefs)
   "Convert XREF-ALIST items to helm candidates and add them to `helm-xref-alist'."
   (dolist (xref xrefs)
@@ -39,12 +49,12 @@
         (setq candidate
               (concat
                (propertize (car (reverse (split-string file "\\/")))
-                           'font-lock-face '(:foreground "cyan"))
+                           'font-lock-face 'helm-xref-file-name)
                (when (string= "integer" (type-of line))
                  (concat
                   ":"
                   (propertize (int-to-string line)
-                              'font-lock-face 'compilation-line-number)))
+                              'font-lock-face 'helm-xref-line-number)))
                ":"
                summary))
         (push `(,candidate . ,marker) helm-xref-alist)))))
