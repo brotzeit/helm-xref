@@ -28,6 +28,10 @@
 (defvar helm-xref-alist nil
   "Holds helm candidates.")
 
+(defgroup helm-xref nil
+  "Xref with helm."
+  :prefix "helm-xref-" :group 'helm)
+
 (defface helm-xref-file-name
   '((t (:foreground "cyan")))
   "Face for xref file name"
