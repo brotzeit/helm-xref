@@ -47,7 +47,6 @@
   (dolist (xref xrefs)
     (with-slots (summary location) xref
       (let* ((line (xref-location-line location))
-             (marker (xref-location-marker location))
              (file (xref-location-group location))
              candidate)
         (setq candidate
@@ -61,45 +60,30 @@
                               'font-lock-face 'helm-xref-line-number)))
                ":"
                summary))
-        (push `(,candidate . ,marker) helm-xref-alist)))))
+        (push (cons candidate xref) helm-xref-alist))))
+  (setq helm-xref-alist (reverse helm-xref-alist)))
 
-(defun helm-xref-goto-location (location func)
-  "Set buffer and point according to xref-location LOCATION.
+(defun helm-xref-goto-xref-item (xref-item func)
+  "Set buffer and point according to xref-item XREF-ITEM.
 
 Use FUNC to display buffer."
-  (let ((buf (marker-buffer location))
-        (offset (marker-position location)))
-    (with-current-buffer buf
-      (goto-char offset)
-      (funcall func buf))))
+  (with-slots (summary location) xref-item
+    (let* ((marker (xref-location-marker location))
+           (buf (marker-buffer marker))
+           (offset (marker-position marker)))
+      (with-current-buffer buf
+        (goto-char offset)
+        (funcall func buf)))))
 
 (defun helm-xref-source ()
   "Return a `helm' source for xref results."
   (helm-build-sync-source "Helm Xref"
     :candidates (lambda ()
                   helm-xref-alist)
-    :persistent-action (lambda (candidate)
-                         (helm-xref-goto-location candidate 'display-buffer))
-    :action (lambda (candidate)
-              (helm-xref-goto-location candidate 'switch-to-buffer))
-    :candidate-transformer (lambda (candidates)
-                             (let (group
-                                   result)
-                               (cl-loop for x in (reverse (cl-sort candidates #'string-lessp :key #'car))
-					do (cond
-					    ((or (= (length group) 0)
-						 (string= (nth 0 (split-string (car x) ":"))
-							  (nth 0 (split-string (car (nth -1 group)) ":"))))
-					     (push x group))
-					    (t
-					     (dolist (xref (cl-sort group #'> :key #'cdr))
-					       (push xref result))
-					     (setq group nil)
-					     (push x group)))
-					finally (when (> (length group) 0)
-						  (dolist (xref (cl-sort group #'> :key #'cdr))
-						    (push xref result))))
-                               result))
+    :persistent-action (lambda (xref-item)
+                         (helm-xref-goto-xref-item xref-item 'display-buffer))
+    :action (lambda (xref-item)
+              (helm-xref-goto-xref-item xref-item 'switch-to-buffer))
     :candidate-number-limit 9999))
 
 (defun helm-xref-show-xrefs (xrefs _alist)
