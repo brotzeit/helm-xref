@@ -54,7 +54,7 @@
                (propertize file 'font-lock-face 'helm-xref-file-name)
                (when (string= "integer" (type-of line))
                  (concat
-                  ":"
+                  "\n:"
                   (propertize (int-to-string line)
                               'font-lock-face 'helm-xref-line-number)))
                ":"
@@ -92,7 +92,7 @@ Needs to be set the value of `xref-show-xrefs-function'."
   (setq helm-xref-alist nil)
   (helm-xref-candidates xrefs)
   (helm :sources (helm-xref-source)
-        :truncate-lines f
+        :truncate-lines t
         :buffer "*helm-xref*"))
 
 (provide 'helm-xref)
