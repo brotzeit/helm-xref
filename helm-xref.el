@@ -51,8 +51,7 @@
              candidate)
         (setq candidate
               (concat
-               (propertize (car (reverse (split-string file "\\/")))
-                           'font-lock-face 'helm-xref-file-name)
+               (propertize file 'font-lock-face 'helm-xref-file-name)
                (when (string= "integer" (type-of line))
                  (concat
                   ":"
@@ -93,7 +92,7 @@ Needs to be set the value of `xref-show-xrefs-function'."
   (setq helm-xref-alist nil)
   (helm-xref-candidates xrefs)
   (helm :sources (helm-xref-source)
-        :truncate-lines t
+        :truncate-lines f
         :buffer "*helm-xref*"))
 
 (provide 'helm-xref)
