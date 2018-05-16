@@ -25,6 +25,9 @@
 (require 'xref)
 (require 'cl-seq)
 
+(defvar helm-xref-candidate-formatting-function 'helm-xref-format-candidate-short
+  "Select the function for candidate formatting.")
+
 (defvar helm-xref-alist nil
   "Holds helm candidates.")
 
@@ -50,17 +53,34 @@
              (file (xref-location-group location))
              candidate)
         (setq candidate
-              (concat
-               (propertize file 'font-lock-face 'helm-xref-file-name)
-               (when (string= "integer" (type-of line))
-                 (concat
-                  "\n:"
-                  (propertize (int-to-string line)
-                              'font-lock-face 'helm-xref-line-number)))
-               ":"
-               summary))
+              (funcall helm-xref-candidate-formatting-function file line summary))
         (push (cons candidate xref) helm-xref-alist))))
   (setq helm-xref-alist (reverse helm-xref-alist)))
+
+(defun helm-xref-format-candidate-short (file line summary)
+  "Build short form of candidate format with FILE, LINE, and SUMMARY."
+  (concat
+   (propertize (car (reverse (split-string file "\\/")))
+	       'font-lock-face 'helm-xref-file-name)
+   (when (string= "integer" (type-of line))
+     (concat
+      ":"
+      (propertize (int-to-string line)
+		  'font-lock-face 'helm-xref-line-number)))
+   ":"
+   summary))
+
+(defun helm-xref-format-candidate-long (file line summary)
+  "Build long form of candidate format with FILE, LINE, and SUMMARY."
+  (concat
+   (propertize file 'font-lock-face 'helm-xref-file-name)
+   (when (string= "integer" (type-of line))
+     (concat
+      "\n:"
+      (propertize (int-to-string line)
+		  'font-lock-face 'helm-xref-line-number)))
+   ":"
+   summary))
 
 (defun helm-xref-goto-xref-item (xref-item func)
   "Set buffer and point according to xref-item XREF-ITEM.
