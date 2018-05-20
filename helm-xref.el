@@ -25,9 +25,6 @@
 (require 'xref)
 (require 'cl-seq)
 
-(defvar helm-xref-candidate-formatting-function 'helm-xref-format-candidate-short
-  "Select the function for candidate formatting.")
-
 (defvar helm-xref-alist nil
   "Holds helm candidates.")
 
@@ -44,6 +41,13 @@
   '((t (:inherit 'compilation-line-number)))
   "Face for xref line number"
   :group 'helm-xref)
+
+(defcustom  helm-xref-candidate-formatting-function 'helm-xref-format-candidate-short
+  "Select the function for candidate formatting."
+  :type '(radio (function-item helm-xref-format-candidate-short)
+		(function-item helm-xref-format-candidate-long)
+		function))
+  :group 'helm-xref
 
 (defun helm-xref-candidates (xrefs)
   "Convert XREF-ALIST items to helm candidates and add them to `helm-xref-alist'."
