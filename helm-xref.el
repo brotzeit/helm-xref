@@ -46,8 +46,8 @@
   "Select the function for candidate formatting."
   :type '(radio (function-item helm-xref-format-candidate-short)
 		(function-item helm-xref-format-candidate-long)
-		function))
-  :group 'helm-xref
+		function)
+  :group 'helm-xref)
 
 (defun helm-xref-candidates (xrefs)
   "Convert XREF-ALIST items to helm candidates and add them to `helm-xref-alist'."
