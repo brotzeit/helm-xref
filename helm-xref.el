@@ -86,17 +86,20 @@
    ":"
    summary))
 
-(defun helm-xref-goto-xref-item (xref-item func)
+(defun helm-xref-goto-xref-item (xref-item)
   "Set buffer and point according to xref-item XREF-ITEM.
 
 Use FUNC to display buffer."
-  (with-slots (summary location) xref-item
+  (with-slots (summary location length) xref-item
     (let* ((marker (xref-location-marker location))
            (buf (marker-buffer marker))
            (offset (marker-position marker)))
-      (with-current-buffer buf
-        (goto-char offset)
-        (funcall func buf)))))
+      (switch-to-buffer buf)
+      (goto-char offset)
+      (let ((helm-input
+	     (regexp-quote (save-excursion
+	       (buffer-substring (point) (progn (forward-char length) (point)))))))
+	(helm-highlight-current-line)))))
 
 (defun helm-xref-source ()
   "Return a `helm' source for xref results."
@@ -104,9 +107,9 @@ Use FUNC to display buffer."
     :candidates (lambda ()
                   helm-xref-alist)
     :persistent-action (lambda (xref-item)
-                         (helm-xref-goto-xref-item xref-item 'display-buffer))
+                         (helm-xref-goto-xref-item xref-item))
     :action (lambda (xref-item)
-              (helm-xref-goto-xref-item xref-item 'switch-to-buffer))
+              (helm-xref-goto-xref-item xref-item))
     :candidate-number-limit 9999))
 
 (defun helm-xref-show-xrefs (xrefs _alist)
