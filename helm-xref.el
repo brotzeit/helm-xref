@@ -87,9 +87,7 @@
    summary))
 
 (defun helm-xref-goto-xref-item (xref-item)
-  "Set buffer and point according to xref-item XREF-ITEM.
-
-Use FUNC to display buffer."
+  "Set buffer and point according to xref-item XREF-ITEM."
   (with-slots (summary location length) xref-item
     (let* ((marker (xref-location-marker location))
            (buf (marker-buffer marker))
