@@ -88,16 +88,13 @@
 
 (defun helm-xref-goto-xref-item (xref-item)
   "Set buffer and point according to xref-item XREF-ITEM."
-  (with-slots (summary location length) xref-item
+  (with-slots (summary location) xref-item
     (let* ((marker (xref-location-marker location))
            (buf (marker-buffer marker))
            (offset (marker-position marker)))
       (switch-to-buffer buf)
       (goto-char offset)
-      (let ((helm-input
-	     (regexp-quote (save-excursion
-	       (buffer-substring (point) (progn (forward-char length) (point)))))))
-	(helm-highlight-current-line)))))
+      (helm-highlight-current-line))))
 
 (defun helm-xref-source ()
   "Return a `helm' source for xref results."
