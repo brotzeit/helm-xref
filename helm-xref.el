@@ -3,7 +3,7 @@
 ;; Copyright (C) 2017  Fritz Stelzer <brotzeitmacher@gmail.com>
 
 ;; Author: Fritz Stelzer <brotzeitmacher@gmail.com>
-;; URL: https://github.com/brotzeitmacher/helm-xref
+;; URL: https://github.com/brotzeit/helm-xref
 ;; Version: 0.2
 ;; Package-Requires: ((emacs "25.1") (helm "1.9.4"))
 
