@@ -105,8 +105,8 @@ Use FUNC to display buffer."
                   helm-xref-alist)
     :persistent-action (lambda (xref-item)
                          (helm-xref-goto-xref-item xref-item 'display-buffer))
-    :action (lambda (xref-item)
-              (helm-xref-goto-xref-item xref-item 'switch-to-buffer))
+    :action '(("Switch to buffer" . (lambda (xref-item) (helm-xref-goto-xref-item xref-item 'switch-to-buffer)))
+              ("Other window" . (lambda (xref-item) (helm-xref-goto-xref-item xref-item 'switch-to-buffer-other-window))))
     :candidate-number-limit 9999))
 
 (defun helm-xref-show-xrefs (xrefs _alist)
