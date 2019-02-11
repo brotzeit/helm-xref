@@ -95,9 +95,9 @@ Use FUNC to display buffer."
     (let* ((marker (xref-location-marker location))
            (buf (marker-buffer marker))
            (offset (marker-position marker)))
-      (with-current-buffer buf
-        (goto-char offset)
-        (funcall func buf)))))
+      (switch-to-buffer buf)
+      (goto-char offset)
+      (funcall func buf))))
 
 (defun helm-xref-source ()
   "Return a `helm' source for xref results."
@@ -105,10 +105,8 @@ Use FUNC to display buffer."
     :candidates (lambda ()
                   helm-xref-alist)
     :persistent-action (lambda (xref-item)
-                         (helm-xref-goto-xref-item xref-item
-                                                   '(lambda (buff)
-                                                      (display-buffer buff)
-                                                      (helm-highlight-current-line))))
+                         (helm-xref-goto-xref-item
+                          xref-item '(lambda (buf) (helm-highlight-current-line))))
     :action '(("Switch to buffer" . (lambda (xref-item) (helm-xref-goto-xref-item xref-item 'switch-to-buffer)))
               ("Other window" . (lambda (xref-item) (helm-xref-goto-xref-item xref-item 'switch-to-buffer-other-window))))
     :candidate-number-limit 9999))
