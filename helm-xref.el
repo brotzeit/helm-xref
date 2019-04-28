@@ -19,6 +19,9 @@
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
 
+;;; Contributors:
+;; Sanjeev Sivasankaran <kalasalatemp at gmail.com> in 2019 changed font-face.
+
 ;;; Code:
 
 (require 'helm)
@@ -34,12 +37,12 @@
   :prefix "helm-xref-" :group 'helm)
 
 (defface helm-xref-file-name
-  '((t (:foreground "cyan")))
+  '((t (:inherit 'font-lock-builtin-face)))
   "Face for xref file name"
   :group 'helm-xref)
 
 (defface helm-xref-line-number
-  '((t (:inherit 'compilation-line-number)))
+  '((t (:inherit 'helm-buffer-size)))
   "Face for xref line number"
   :group 'helm-xref)
 
