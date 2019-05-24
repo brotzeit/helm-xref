@@ -42,7 +42,7 @@
   :group 'helm-xref)
 
 (defface helm-xref-line-number
-  '((t (:inherit 'helm-buffer-size)))
+  '((t (:inherit 'helm-grep-lineno)))
   "Face for xref line number"
   :group 'helm-xref)
 
