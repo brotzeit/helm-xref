@@ -4,7 +4,7 @@
 
 ;; Author: Fritz Stelzer <brotzeitmacher@gmail.com>
 ;; URL: https://github.com/brotzeit/helm-xref
-;; Version: 0.3
+;; Version: 0.4
 ;; Package-Requires: ((emacs "25.1") (helm "1.9.4"))
 
 ;;; License:
@@ -53,7 +53,7 @@
 		function)
   :group 'helm-xref)
 
-(defun helm-xref-candidates (xrefs)
+(defun helm-xref-candidates-26 (xrefs)
   "Convert XREF-ALIST items to helm candidates and add them to `helm-xref-alist'."
   (dolist (xref xrefs)
     (with-slots (summary location) xref
@@ -63,6 +63,23 @@
         (setq candidate
               (funcall helm-xref-candidate-formatting-function file line summary))
         (push (cons candidate xref) helm-xref-alist))))
+  (setq helm-xref-alist (reverse helm-xref-alist)))
+
+(defun helm-xref-candidates-27 (fetcher alist)
+  "Convert XREF-ALIST items to helm candidates and add them to `helm-xref-alist'."
+  (cl-assert (functionp fetcher))
+  (let* ((xrefs
+          (or
+           (assoc-default 'fetched-xrefs alist)
+           (funcall fetcher))))
+	(dolist (xref xrefs)
+	  (with-slots (summary location) xref
+	    (let* ((line (xref-location-line location))
+		       (file (xref-location-group location))
+		       candidate)
+          (setq candidate
+		        (funcall helm-xref-candidate-formatting-function file line summary))
+          (push (cons candidate xref) helm-xref-alist)))))
   (setq helm-xref-alist (reverse helm-xref-alist)))
 
 (defun helm-xref-format-candidate-short (file line summary)
@@ -119,10 +136,24 @@ Use FUNC to display buffer."
 
 Needs to be set the value of `xref-show-xrefs-function'."
   (setq helm-xref-alist nil)
-  (helm-xref-candidates xrefs)
+  (helm-xref-candidates-26 xrefs)
   (helm :sources (helm-xref-source)
         :truncate-lines t
         :buffer "*helm-xref*"))
+
+(defun helm-xref-show-xrefs-27 (fetcher alist)
+  "Function to display XREFS.
+
+Needs to be set the value of `xref-show-xrefs-function'."
+  (setq helm-xref-alist nil)
+  (helm-xref-candidates-27 fetcher alist)
+  (helm :sources (helm-xref-source)
+        :truncate-lines t
+        :buffer "*helm-xref*"))
+
+(if (< emacs-major-version 27)
+    (setq xref-show-xrefs-function 'helm-xref-show-xrefs)
+  (setq xref-show-xrefs-function 'helm-xref-show-xrefs-27))
 
 (provide 'helm-xref)
 ;;; helm-xref.el ends here
