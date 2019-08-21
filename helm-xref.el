@@ -46,11 +46,13 @@
   "Face for xref line number"
   :group 'helm-xref)
 
-(defcustom  helm-xref-candidate-formatting-function 'helm-xref-format-candidate-short
+(defcustom helm-xref-candidate-formatting-function 'helm-xref-format-candidate-short
   "Select the function for candidate formatting."
-  :type '(radio (function-item helm-xref-format-candidate-short)
-		(function-item helm-xref-format-candidate-long)
-		function)
+  :type '(radio
+          (function-item helm-xref-format-candidate-short)
+          (function-item helm-xref-format-candidate-full-path)
+		  (function-item helm-xref-format-candidate-long)
+		  function)
   :group 'helm-xref)
 
 (defun helm-xref-candidates-26 (xrefs)
@@ -95,8 +97,20 @@
    ":"
    summary))
 
+(defun helm-xref-format-candidate-full-path (file line summary)
+  "Same as `helm-xref-format-candidate-short', but display entire path."
+  (concat
+   (propertize file 'font-lock-face 'helm-xref-file-name)
+   (when (string= "integer" (type-of line))
+     (concat
+      ":"
+      (propertize (int-to-string line)
+		  'font-lock-face 'helm-xref-line-number)))
+   ":"
+   summary))
+
 (defun helm-xref-format-candidate-long (file line summary)
-  "Build long form of candidate format with FILE, LINE, and SUMMARY."
+  "Use two lines for each candidate. One contains the path and the other the actual candidate."
   (concat
    (propertize file 'font-lock-face 'helm-xref-file-name)
    (when (string= "integer" (type-of line))
