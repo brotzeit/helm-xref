@@ -166,8 +166,10 @@ Needs to be set the value of `xref-show-xrefs-function'."
         :buffer "*helm-xref*"))
 
 (if (< emacs-major-version 27)
-    (setq xref-show-xrefs-function 'helm-xref-show-xrefs)
-  (setq xref-show-xrefs-function 'helm-xref-show-xrefs-27))
+      (setq xref-show-xrefs-function 'helm-xref-show-xrefs)
+    (progn
+       (setq xref-show-xrefs-function 'helm-xref-show-xrefs-27)
+       (setq xref-show-definitions-function 'helm-xref-show-xrefs-27)))
 
 (provide 'helm-xref)
 ;;; helm-xref.el ends here
