@@ -136,8 +136,7 @@ Use FUNC to display buffer."
 (defun helm-xref-source ()
   "Return a `helm' source for xref results."
   (helm-build-sync-source "Helm Xref"
-    :candidates (lambda ()
-                  helm-xref-alist)
+    :candidates helm-xref-alist
     :persistent-action (lambda (xref-item)
                          (helm-xref-goto-xref-item
                           xref-item '(lambda (buf) (helm-highlight-current-line))))
@@ -165,11 +164,23 @@ Needs to be set the value of `xref-show-xrefs-function'."
         :truncate-lines t
         :buffer "*helm-xref*"))
 
+(defun helm-xref-show-defs-27 (fetcher alist)
+  "Function to display list of definitions."
+  (let ((xrefs (funcall fetcher)))
+    (cond
+     ((not (cdr xrefs))
+      (xref-pop-to-location (car xrefs)
+                            (assoc-default 'display-action alist)))
+     (t
+      (helm-xref-show-xrefs-27 fetcher
+                               (cons (cons 'fetched-xrefs xrefs)
+                                     alist))))))
+
 (if (< emacs-major-version 27)
     (setq xref-show-xrefs-function 'helm-xref-show-xrefs)
   (progn
     (setq xref-show-xrefs-function 'helm-xref-show-xrefs-27)
-    (setq xref-show-definitions-function 'helm-xref-show-xrefs-27)))
+    (setq xref-show-definitions-function 'helm-xref-show-defs-27)))
 
 (provide 'helm-xref)
 ;;; helm-xref.el ends here
