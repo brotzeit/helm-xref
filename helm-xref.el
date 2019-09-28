@@ -121,11 +121,11 @@
    ":"
    summary))
 
-(defun helm-xref-goto-xref-item (xref-item func)
-  "Set buffer and point according to xref-item XREF-ITEM.
+(defun helm-xref-goto-xref-item (item func)
+  "Set buffer and point according to xref-item ITEM.
 
 Use FUNC to display buffer."
-  (with-slots (summary location) xref-item
+  (with-slots (summary location) item
     (let* ((marker (xref-location-marker location))
            (buf (marker-buffer marker))
            (offset (marker-position marker)))
@@ -137,11 +137,11 @@ Use FUNC to display buffer."
   "Return a `helm' source for xref results."
   (helm-build-sync-source "Helm Xref"
     :candidates helm-xref-alist
-    :persistent-action (lambda (xref-item)
+    :persistent-action (lambda (item)
                          (helm-xref-goto-xref-item
-                          xref-item '(lambda (buf) (helm-highlight-current-line))))
-    :action '(("Switch to buffer" . (lambda (xref-item) (helm-xref-goto-xref-item xref-item 'switch-to-buffer)))
-              ("Other window" . (lambda (xref-item) (helm-xref-goto-xref-item xref-item 'switch-to-buffer-other-window))))
+                          item '(lambda (buf) (helm-highlight-current-line))))
+    :action '(("Switch to buffer" . (lambda (item) (helm-xref-goto-xref-item item 'switch-to-buffer)))
+              ("Other window" . (lambda (item) (helm-xref-goto-xref-item item 'switch-to-buffer-other-window))))
     :candidate-number-limit 9999))
 
 (defun helm-xref-show-xrefs (xrefs _alist)
