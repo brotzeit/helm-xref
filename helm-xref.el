@@ -4,6 +4,7 @@
 
 ;; Author: Fritz Stelzer <brotzeitmacher@gmail.com>
 ;; URL: https://github.com/brotzeit/helm-xref
+;; Package-Version: 20190930.1646
 ;; Version: 0.5
 ;; Package-Requires: ((emacs "25.1") (helm "1.9.4"))
 
@@ -53,6 +54,11 @@
           (function-item helm-xref-format-candidate-full-path)
 		  (function-item helm-xref-format-candidate-long)
 		  function)
+  :group 'helm-xref)
+
+(defcustom helm-xref-input ""
+  "Initial input in Helm."
+  :type 'string
   :group 'helm-xref)
 
 (defun helm-xref-candidates-26 (xrefs)
@@ -152,6 +158,7 @@ Needs to be set the value of `xref-show-xrefs-function'."
   (helm-xref-candidates-26 xrefs)
   (helm :sources (helm-xref-source)
         :truncate-lines t
+        :input helm-xref-input
         :buffer "*helm-xref*"))
 
 (defun helm-xref-show-xrefs-27 (fetcher alist)
