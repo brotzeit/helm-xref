@@ -28,6 +28,7 @@
 (require 'helm-utils)
 (require 'xref)
 (require 'cl-seq)
+(require 'project)
 
 (defvar helm-xref-alist nil
   "Holds helm candidates.")
@@ -50,9 +51,10 @@
   "Select the function for candidate formatting."
   :type '(radio
           (function-item helm-xref-format-candidate-short)
+          (function-item helm-xref-format-candidate-project-path)
           (function-item helm-xref-format-candidate-full-path)
-		  (function-item helm-xref-format-candidate-long)
-		  function)
+          (function-item helm-xref-format-candidate-long)
+          function)
   :group 'helm-xref)
 
 (defcustom helm-xref-input ""
@@ -79,13 +81,13 @@
           (or
            (assoc-default 'fetched-xrefs alist)
            (funcall fetcher))))
-	(dolist (xref xrefs)
-	  (with-slots (summary location) xref
-	    (let* ((line (xref-location-line location))
-		       (file (xref-location-group location))
-		       candidate)
+    (dolist (xref xrefs)
+      (with-slots (summary location) xref
+        (let* ((line (xref-location-line location))
+               (file (xref-location-group location))
+               candidate)
           (setq candidate
-		        (funcall helm-xref-candidate-formatting-function file line summary))
+                (funcall helm-xref-candidate-formatting-function file line summary))
           (push (cons candidate xref) helm-xref-alist)))))
   (setq helm-xref-alist (reverse helm-xref-alist)))
 
@@ -93,12 +95,36 @@
   "Build short form of candidate format with FILE, LINE, and SUMMARY."
   (concat
    (propertize (car (reverse (split-string file "\\/")))
-	       'font-lock-face 'helm-xref-file-name)
+               'font-lock-face 'helm-xref-file-name)
    (when (string= "integer" (type-of line))
      (concat
       ":"
       (propertize (int-to-string line)
-		  'font-lock-face 'helm-xref-line-number)))
+                  'font-lock-face 'helm-xref-line-number)))
+   ":"
+   summary))
+
+(defun helm-xref--get-file-project-path (file)
+  "Get project path and cut that path off FILE."
+  (let ((root (cdr (project-current)))
+        (file-abs-path (file-truename file)))
+    (substring file-abs-path
+               (if root
+                   (length (file-truename root))
+                 0))))
+
+(defun helm-xref-format-candidate-project-path (file line summary)
+  "Same as `helm-xref-format-candidate-short', but display project path.
+
+ Note that`xref-file-name-display' value must be 'abs"
+  (concat
+   (propertize (helm-xref--get-file-project-path file)
+               'font-lock-face 'helm-xref-file-name)
+   (when (string= "integer" (type-of line))
+     (concat
+      ":"
+      (propertize (int-to-string line)
+                  'font-lock-face 'helm-xref-line-number)))
    ":"
    summary))
 
@@ -110,7 +136,7 @@
      (concat
       ":"
       (propertize (int-to-string line)
-		  'font-lock-face 'helm-xref-line-number)))
+                  'font-lock-face 'helm-xref-line-number)))
    ":"
    summary))
 
@@ -122,7 +148,7 @@
      (concat
       "\n:"
       (propertize (int-to-string line)
-		  'font-lock-face 'helm-xref-line-number)))
+                  'font-lock-face 'helm-xref-line-number)))
    ":"
    summary))
 
