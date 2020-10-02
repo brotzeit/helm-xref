@@ -149,6 +149,7 @@ Use FUNC to display buffer."
               ("Other window" . (lambda (item) (helm-xref-goto-xref-item item 'switch-to-buffer-other-window))))
     :candidate-number-limit 9999))
 
+;;;###autoload
 (defun helm-xref-show-xrefs (xrefs _alist)
   "Function to display XREFS.
 
@@ -160,6 +161,7 @@ Needs to be set the value of `xref-show-xrefs-function'."
         :input helm-xref-input
         :buffer "*helm-xref*"))
 
+;;;###autoload
 (defun helm-xref-show-xrefs-27 (fetcher alist)
   "Function to display XREFS.
 
@@ -170,6 +172,7 @@ Needs to be set the value of `xref-show-xrefs-function'."
         :truncate-lines t
         :buffer "*helm-xref*"))
 
+;;;###autoload
 (defun helm-xref-show-defs-27 (fetcher alist)
   "Function to display list of definitions."
   (let ((xrefs (funcall fetcher)))
@@ -182,11 +185,13 @@ Needs to be set the value of `xref-show-xrefs-function'."
                                (cons (cons 'fetched-xrefs xrefs)
                                      alist))))))
 
-(if (< emacs-major-version 27)
-    (setq xref-show-xrefs-function 'helm-xref-show-xrefs)
-  (progn
-    (setq xref-show-xrefs-function 'helm-xref-show-xrefs-27)
-    (setq xref-show-definitions-function 'helm-xref-show-defs-27)))
+;;;###autoload
+(progn
+  (if (< emacs-major-version 27)
+      (setq xref-show-xrefs-function 'helm-xref-show-xrefs)
+    (progn
+      (setq xref-show-xrefs-function 'helm-xref-show-xrefs-27)
+      (setq xref-show-definitions-function 'helm-xref-show-defs-27))))
 
 (provide 'helm-xref)
 ;;; helm-xref.el ends here
