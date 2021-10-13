@@ -63,13 +63,14 @@
 (defun helm-xref-candidates-26 (xrefs)
   "Convert XREF-ALIST items to helm candidates and add them to `helm-xref-alist'."
   (dolist (xref xrefs)
-    (with-slots (summary location) xref
-      (let* ((line (xref-location-line location))
-             (file (xref-location-group location))
-             candidate)
-        (setq candidate
-              (funcall helm-xref-candidate-formatting-function file line summary))
-        (push (cons candidate xref) helm-xref-alist))))
+    (let* ((summary (xref-item-summary xref))
+           (location (xref-item-location xref))
+           (line (xref-location-line location))
+           (file (xref-location-group location))
+           candidate)
+      (setq candidate
+            (funcall helm-xref-candidate-formatting-function file line summary))
+      (push (cons candidate xref) helm-xref-alist)))
   (setq helm-xref-alist (reverse helm-xref-alist)))
 
 (defun helm-xref-candidates-27 (fetcher alist)
@@ -80,13 +81,14 @@
            (assoc-default 'fetched-xrefs alist)
            (funcall fetcher))))
 	(dolist (xref xrefs)
-	  (with-slots (summary location) xref
-	    (let* ((line (xref-location-line location))
+	  (let* ((summary (xref-item-summary xref))
+           (location (xref-item-location xref))
+           (line (xref-location-line location))
 		       (file (xref-location-group location))
 		       candidate)
-          (setq candidate
+      (setq candidate
 		        (funcall helm-xref-candidate-formatting-function file line summary))
-          (push (cons candidate xref) helm-xref-alist)))))
+      (push (cons candidate xref) helm-xref-alist))))
   (setq helm-xref-alist (reverse helm-xref-alist)))
 
 (defun helm-xref-format-candidate-short (file line summary)
@@ -130,13 +132,14 @@
   "Set buffer and point according to xref-item ITEM.
 
 Use FUNC to display buffer."
-  (with-slots (summary location) item
-    (let* ((marker (xref-location-marker location))
-           (buf (marker-buffer marker))
-           (offset (marker-position marker)))
-      (switch-to-buffer buf)
-      (goto-char offset)
-      (funcall func buf))))
+  (let* ((summary (xref-item-summary item))
+         (location (xref-item-location item))
+         (marker (xref-location-marker location))
+         (buf (marker-buffer marker))
+         (offset (marker-position marker)))
+    (switch-to-buffer buf)
+    (goto-char offset)
+    (funcall func buf)))
 
 (defun helm-xref-source ()
   "Return a `helm' source for xref results."
